@@ -1,0 +1,18 @@
+FROM openjdk:8
+
+#create app_tmp directory
+RUN mkdir app_tmp
+
+#copy all jar files to app_tmp
+COPY ./build/libs/*.jar app_tmp/
+
+#find the latest one in case that it has more than one jar file
+RUN find app_tmp -name "*.jar" | sort | tail -n 1
+
+#copy the latest one to docker 
+RUN cp $(find app_tmp -name "*.jar" | sort | tail -n 1) app.jar
+
+#remove app_tmp directory
+RUN rm -rf app_tmp
+
+ENTRYPOINT ["java","-jar","/app.jar"]

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+eval "$( dirname "${BASH_SOURCE[0]}" )/fix-volume-permission" && \
+docker-compose run --rm schema
