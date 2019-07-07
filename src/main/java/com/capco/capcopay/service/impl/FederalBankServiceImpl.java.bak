@@ -1,0 +1,125 @@
+package com.capco.capcopay.service.impl;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import com.capco.capcopay.federal.request.Account_statement_req;
+import com.capco.capcopay.federal.request.BeneficiaryDetails;
+import com.capco.capcopay.federal.request.Body;
+import com.capco.capcopay.federal.request.FundTransferRequest;
+import com.capco.capcopay.federal.request.Header;
+import com.capco.capcopay.federal.request.RemmiterDetails;
+import com.capco.capcopay.federal.request.ViewAccountRequest;
+import com.capco.capcopay.federal.response.ViewAccountResponse;
+import com.capco.capcopay.service.FederalBankService;
+
+@Service
+public class FederalBankServiceImpl implements FederalBankService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(FederalBankServiceImpl.class); 
+	
+	final RestTemplate restTemplate;
+	final String client_id ="b5d764f0-b5db-457b-8aa8-c792eb02bed0";
+//	final String client_secret="yX2wL3uK5aY2cM0tM3sU5gW5hD8oJ3wQ4sC2vJ0qE7yN1xL3dU";
+	final String client_secret="sV1qA5oA7cL8qT7eU4pT5dM7aB5yR6dF7fL0fA4hG7eV3hP2jN";
+	
+	public FederalBankServiceImpl(RestTemplate restTemplate) {
+		this.restTemplate=restTemplate;
+	}
+	
+	@Override
+	public ViewAccountResponse viewAccountDetails() {
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add("accept", "capco");
+		
+		Header header = new Header();
+		header.setUser_id("xyz");
+		header.setPassword("xyz");
+		
+		Body body = new Body();
+		body.setSender_cd("tuimoj");
+		body.setAccount_num("5018412171087063");
+		body.setDate("12/11/2051");
+		body.setSeq_num("lihafive");
+		
+		Account_statement_req account_statement_req = new Account_statement_req();
+		account_statement_req.setBody(body);
+		account_statement_req.setHeader(header);
+		
+		ViewAccountRequest viewAccountRequest = new ViewAccountRequest();
+		viewAccountRequest.setAccount_statement_req(account_statement_req);
+
+		ResponseEntity<ViewAccountResponse> response = null;
+  
+		try {       	
+			HttpEntity<ViewAccountRequest> entity = new HttpEntity<ViewAccountRequest>(viewAccountRequest, headers);
+			response = restTemplate.exchange("https://sandgateway.federalbank.co.in/paylite/accountStatement", HttpMethod.POST, entity, ViewAccountResponse.class);
+			System.out.println("Result - status ("+ response.getStatusCode() + ") has body: " + response.hasBody());      
+      } catch (Exception e) {
+   	   e.getMessage();
+          e.printStackTrace();
+      } 
+		return response.getBody();
+	}
+	
+	public void fundTransfer() {
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add("accept", "capco");
+		
+		Header header = new Header();
+		header.setUser_id("xyz");
+		header.setPassword("xyz");
+
+		BeneficiaryDetails beneficiaryDetails = new BeneficiaryDetails();
+		beneficiaryDetails.setAccNumber("6304142184227155");
+		beneficiaryDetails.setEmail("risvokh");
+		beneficiaryDetails.setMobile("risvokh");
+		beneficiaryDetails.setName("Mario Strickland");
+		beneficiaryDetails.setNotification_Flag("jorpi");
+		
+		RemmiterDetails remmiterDetails = new RemmiterDetails();
+		remmiterDetails.setAccNumber("6216379831498162");
+		remmiterDetails.setEmail("dagk");
+		remmiterDetails.setMobile("dagk");
+		remmiterDetails.setName("Raymond Harvey");
+		remmiterDetails.setNotification_Flag("kokluga");
+		
+		
+		FundTransferRequest fundTransferRequest = new FundTransferRequest();
+		fundTransferRequest.setRespUrl("http://lunzu.to/koz");
+		fundTransferRequest.setUserid("Juan");
+		fundTransferRequest.setPassword("veeghup");
+		fundTransferRequest.setSendercd("lobe");
+		fundTransferRequest.setTranDate("4/15/2050");
+		fundTransferRequest.setReferenceId("7679033164693504");
+		fundTransferRequest.setAmount(24.19120895);
+		fundTransferRequest.setRemarks("serips");
+		fundTransferRequest.setSender_Data("hehizeb");
+		
+		fundTransferRequest.setBeneficiaryDetails(beneficiaryDetails);
+		fundTransferRequest.setRemmiterDetails(remmiterDetails);
+		
+		ResponseEntity<String> response = null;
+  
+		try {       	
+			HttpEntity<FundTransferRequest> entity = new HttpEntity<FundTransferRequest>(fundTransferRequest, headers);
+			response = restTemplate.exchange("https://sandgateway.federalbank.co.in/intrabank/fundtransfer", HttpMethod.POST, entity, String.class);
+			System.out.println("Result - status ("+ response.getStatusCode() + ") has body: " + response.hasBody());      
+      } catch (Exception e) {
+   	   e.getMessage();
+          e.printStackTrace();
+      } 
+//		return response.getBody();
+	}
+}
